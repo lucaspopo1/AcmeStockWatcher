@@ -132,8 +132,6 @@ public class StockList {
         });
 
         mainStockListPanel.setPreferredSize(new Dimension(1500, 600));
-        //stockScrollPanel.setPreferredSize(new Dimension(1500, 200));
-        //stockScrollPanel.setSize(1500, 200);
     }
 
     private void setFilter() {
