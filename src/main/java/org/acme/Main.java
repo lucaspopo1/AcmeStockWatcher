@@ -12,7 +12,7 @@ public class Main {
         JPanel panel = stockList.getMainStockListPanel();
         stockList.setData(stocksData);
 
-
+//added comment
 
         frame.setContentPane(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
