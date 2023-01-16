@@ -7,7 +7,7 @@ public class Main {
 
         StockFileReader stockFileReader = new StockFileReader();
         Object[][] stocksData = stockFileReader.readStocks();
-        JFrame frame = new JFrame("Hello world");
+        JFrame frame = new JFrame("Stock Search");
         StockList stockList = new StockList();
         JPanel panel = stockList.getMainStockListPanel();
         stockList.setData(stocksData);

@@ -29,6 +29,11 @@ public class StockList {
     private JPanel dialPanel;
     private JComboBox<FilterComboItem<Double>> mktCapComboBox;
     private JComboBox<FilterComboItem<Float>> priorCloseComboBox;
+    private JComboBox<FilterComboItem<Float>> peRatioComboBox;
+    private JComboBox<FilterComboItem<Float>> revenueGrowthComboBox;
+    private JComboBox<FilterComboItem<Float>> returnonEquityComboBox;
+    private JComboBox<FilterComboItem<Float>> epsGrowthComboBox;
+    private JComboBox<FilterComboItem<Float>> dividendYieldComboBox;
     private TableRowSorter<TableModel> sorter;
     private DefaultValueDataset data;
 
@@ -48,6 +53,54 @@ public class StockList {
         priorCloseComboBox.addItem(new FilterComboItem<>("10 < x < 30", d-> 10.0 < d && d < 30.0));
         priorCloseComboBox.addItem(new FilterComboItem<>("< 10", d-> d < 10.0));
         priorCloseComboBox.addActionListener(e -> setFilter());
+
+        peRatioComboBox.addItem(new FilterComboItem<>(NOT_SET, d -> true));
+        peRatioComboBox.addItem(new FilterComboItem<>(">100x",d-> d > 100.0));
+        peRatioComboBox.addItem(new FilterComboItem<>("50x < y < 100x",d-> d > 50.0 && d < 100.0));
+        peRatioComboBox.addItem(new FilterComboItem<>("30x < y < 50x",d-> d > 30.0 && d < 50.0));
+        peRatioComboBox.addItem(new FilterComboItem<>("20x < y < 30x",d-> d > 20.0 && d < 30.0));
+        peRatioComboBox.addItem(new FilterComboItem<>("10x < y < 20x",d-> d > 10.0 && d < 20.0));
+        peRatioComboBox.addItem(new FilterComboItem<>("10x<",d-> d < 10.0));
+        peRatioComboBox.addActionListener(e -> setFilter());
+
+        revenueGrowthComboBox.addItem(new FilterComboItem<>(NOT_SET, d -> true));
+        revenueGrowthComboBox.addItem(new FilterComboItem<>(">300%", d -> d > 300.0));
+        revenueGrowthComboBox.addItem(new FilterComboItem<>(">200%", d -> d > 200.0));
+        revenueGrowthComboBox.addItem(new FilterComboItem<>(">100%", d -> d > 100.0));
+        revenueGrowthComboBox.addItem(new FilterComboItem<>("50% < x < 100%", d -> d > 50.0 && d < 100.0));
+        revenueGrowthComboBox.addItem(new FilterComboItem<>("0% < x < 50%", d -> d > 0 && d < 50.0));
+        revenueGrowthComboBox.addItem(new FilterComboItem<>("-50% < x < 0%", d -> d > -50.0 && d < 0));
+        revenueGrowthComboBox.addItem(new FilterComboItem<>("<-50%", d -> d < -50.0));
+        revenueGrowthComboBox.addActionListener(e -> setFilter());
+
+        returnonEquityComboBox.addItem(new FilterComboItem<>(NOT_SET, d -> true));
+        returnonEquityComboBox.addItem(new FilterComboItem<>(">100%",d-> d > 100.0));
+        returnonEquityComboBox.addItem(new FilterComboItem<>(">50%",d-> d > 50.0));
+        returnonEquityComboBox.addItem(new FilterComboItem<>("20% < x < 50%",d-> d > 20.0 && d < 50.0));
+        returnonEquityComboBox.addItem(new FilterComboItem<>("0% < x < 20%",d-> d > 0 && d < 20.0));
+        returnonEquityComboBox.addItem(new FilterComboItem<>("-20% < x < 0%",d-> d > -20.0 && d < 0));
+        returnonEquityComboBox.addItem(new FilterComboItem<>("-50% < x < -20%",d-> d > -50.0 && d < -20.0));
+        returnonEquityComboBox.addItem(new FilterComboItem<>("<-50%",d-> d < -50.0));
+        returnonEquityComboBox.addActionListener(e -> setFilter());
+
+        epsGrowthComboBox.addItem(new FilterComboItem<>(NOT_SET, d -> true));
+        epsGrowthComboBox.addItem(new FilterComboItem<>(">100%",d-> d > 100.0));
+        epsGrowthComboBox.addItem(new FilterComboItem<>(">50%",d-> d > 50.0));
+        epsGrowthComboBox.addItem(new FilterComboItem<>("20% < x < 50%",d-> d > 20.0 && d < 50.0));
+        epsGrowthComboBox.addItem(new FilterComboItem<>("0% < x < 20%",d-> d > 0 && d < 20.0));
+        epsGrowthComboBox.addItem(new FilterComboItem<>("-20% < x < 0%",d-> d > -20.0 && d < 0));
+        epsGrowthComboBox.addItem(new FilterComboItem<>("-50% < x < -20%",d-> d > -50.0 && d < -20.0));
+        epsGrowthComboBox.addItem(new FilterComboItem<>("<-50%",d-> d < -50.0));
+        epsGrowthComboBox.addActionListener(e -> setFilter());
+
+        dividendYieldComboBox.addItem(new FilterComboItem<>(NOT_SET, d -> true));
+        dividendYieldComboBox.addItem(new FilterComboItem<>("Yes", d -> d > 0));
+        dividendYieldComboBox.addItem(new FilterComboItem<>("No", d -> d == 0));
+        dividendYieldComboBox.addActionListener(e -> setFilter());
+
+
+
+
 
         Set<String> industrySet = new HashSet<>();
         for(Object[] record: stocksData) {
@@ -138,7 +191,8 @@ public class StockList {
         sorter.setRowFilter(new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
-                return isIndustry(entry) && isName(entry) && isMktCap(entry) && isPriorClose(entry);
+                return isIndustry(entry) && isName(entry) && isMktCap(entry) && isPriorClose(entry) && isPeRatio(entry) && isRevenueGrowth(entry)
+                        && isReturnOnEquity(entry) && isEpsGrowth(entry) && isDividendYield(entry);
             }
         });
     }
@@ -152,6 +206,36 @@ public class StockList {
         FilterComboItem<Double> mktCapComboItem = (FilterComboItem) mktCapComboBox.getSelectedItem();
         return mktCapComboItem.getCompareMethod().test((Double) entry.getValue(3));
     }
+
+    private boolean isPeRatio(RowFilter.Entry<? extends TableModel, ? extends Integer> entry){
+        FilterComboItem<Float> peRatioComboItem = (FilterComboItem<Float>) peRatioComboBox.getSelectedItem();
+        return peRatioComboItem.getCompareMethod().test((Float) entry.getValue(5));
+    }
+
+    private boolean isRevenueGrowth(RowFilter.Entry<? extends TableModel, ? extends Integer> entry){
+        FilterComboItem<Float> revenueGrowthComboItem = (FilterComboItem<Float>) revenueGrowthComboBox.getSelectedItem();
+        return revenueGrowthComboItem.getCompareMethod().test((Float) entry.getValue(6));
+    }
+
+
+    private boolean isReturnOnEquity(RowFilter.Entry<? extends TableModel, ? extends Integer> entry){
+        FilterComboItem<Float> returnonEquityComboItem = (FilterComboItem<Float>) returnonEquityComboBox.getSelectedItem();
+        return returnonEquityComboItem.getCompareMethod().test((Float) entry.getValue(7));
+    }
+
+
+    private boolean isEpsGrowth(RowFilter.Entry<? extends TableModel, ? extends Integer> entry){
+        FilterComboItem<Float> epsGrowthComboItem = (FilterComboItem<Float>) epsGrowthComboBox.getSelectedItem();
+        return epsGrowthComboItem.getCompareMethod().test((Float) entry.getValue(8));
+    }
+
+
+    private boolean isDividendYield(RowFilter.Entry<? extends TableModel, ? extends Integer> entry){
+        FilterComboItem<Float> dividendYieldComboItem = (FilterComboItem<Float>) dividendYieldComboBox.getSelectedItem();
+        return dividendYieldComboItem.getCompareMethod().test((Float) entry.getValue(9));
+    }
+
+
 
     private boolean isName(RowFilter.Entry<? extends TableModel, ? extends Integer> entry) {
         String nameFilter = companyNameFilter.getText();
@@ -210,7 +294,7 @@ public class StockList {
         panel.add(new ChartPanel(chart) {
             @Override
             public Dimension getPreferredSize() {
-                return new Dimension(350, 300);
+                return new Dimension(300, 200);
             }
         });
 
